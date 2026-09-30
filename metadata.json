@@ -1,0 +1,6 @@
+{
+  "name": "ImmoPilot - TogoLux Properties",
+  "description": "Logiciel interne professionnel de gestion immobilière privée pour TogoLux Properties : gestion des biens, propriétaires, locataires, finances FCFA, maintenance, documents, rapports et assistant IA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
