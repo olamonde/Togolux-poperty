@@ -41,7 +41,7 @@ export const OwnerPortalView: React.FC = () => {
   const ownerProperties = properties.filter((p) => p.ownerId === currentOwner.id);
   const ownerPropertyIds = ownerProperties.map((p) => p.id);
 
-  const ownerTenants = tenants.filter((t) => ownerPropertyIds.includes(t.propertyId));
+  const ownerTenants = tenants.filter((t) => t.propertyId && ownerPropertyIds.includes(t.propertyId));
   const occupiedCount = ownerProperties.filter((p) => p.status === 'Occupé').length;
 
   const ownerTransactions = transactions.filter((t) => t.ownerId === currentOwner.id);
@@ -147,7 +147,7 @@ export const OwnerPortalView: React.FC = () => {
           <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs">
             <span className="text-xs text-slate-500 font-medium block">Solde net à vous reverser</span>
             <span className="text-2xl font-bold text-amber-700 mt-1 block">
-              {formatPrice(currentOwner.currentBalanceToPayout)}
+              {formatPrice(currentOwner.currentBalanceToPayout || 0)}
             </span>
             <span className="text-[11px] text-slate-500">Prêt pour virement</span>
           </div>
@@ -258,7 +258,7 @@ export const OwnerPortalView: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500">Caution de garantie :</span>
                       <span className="font-medium text-slate-800">
-                        {formatPrice(selectedProperty.depositAmount)}
+                        {formatPrice(selectedProperty.depositAmount || selectedProperty.securityDeposit || 0)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">

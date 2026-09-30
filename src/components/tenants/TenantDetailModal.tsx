@@ -94,7 +94,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
               Loyer mensuel
             </span>
             <span className="text-lg font-bold text-slate-900">
-              {formatPrice(tenant.monthlyRent)}
+              {formatPrice(tenant.monthlyRent || 0)}
             </span>
           </div>
 
@@ -147,7 +147,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
                 Bien loué : <b className="text-slate-900">{tenant.propertyName}</b>
               </div>
               <div>
-                Caution déposée : <b className="text-slate-900">{formatPrice(tenant.depositPaid)}</b>
+                Caution déposée : <b className="text-slate-900">{formatPrice(tenant.depositPaid || 0)}</b>
               </div>
               <div>
                 Période : Du {tenant.leaseStartDate} au {tenant.leaseEndDate}

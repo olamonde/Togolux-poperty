@@ -50,8 +50,8 @@ export const FinancesView: React.FC<FinancesViewProps> = ({
   const filtered = transactions.filter((t) => {
     const matchSearch =
       t.description.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
-      t.category.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
-      t.ref.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+      (t.category || '').toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+      (t.ref || t.reference || '').toLowerCase().includes(effectiveSearch.toLowerCase()) ||
       (t.propertyName && t.propertyName.toLowerCase().includes(effectiveSearch.toLowerCase())) ||
       (t.ownerName && t.ownerName.toLowerCase().includes(effectiveSearch.toLowerCase())) ||
       (t.tenantName && t.tenantName.toLowerCase().includes(effectiveSearch.toLowerCase()));

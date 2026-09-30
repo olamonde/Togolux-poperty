@@ -109,7 +109,7 @@ export const OwnerDetailModal: React.FC<OwnerDetailModalProps> = ({
               Solde net disponible à reverser
             </span>
             <span className="text-lg font-bold text-slate-900">
-              {formatPrice(owner.currentBalanceToPayout)}
+              {formatPrice(owner.currentBalanceToPayout || 0)}
             </span>
           </div>
 

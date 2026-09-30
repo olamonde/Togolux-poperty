@@ -37,9 +37,9 @@ export const PropertiesView: React.FC<PropertiesViewProps> = ({
   const filtered = properties.filter((p) => {
     const matchSearch =
       p.name.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
-      p.ref.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+      (p.ref || p.reference || '').toLowerCase().includes(effectiveSearch.toLowerCase()) ||
       p.neighborhood.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
-      p.ownerName.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+      (p.ownerName || '').toLowerCase().includes(effectiveSearch.toLowerCase()) ||
       (p.currentTenantName && p.currentTenantName.toLowerCase().includes(effectiveSearch.toLowerCase()));
 
     const matchStatus = statusFilter === 'all' || p.status === statusFilter;

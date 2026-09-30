@@ -30,8 +30,8 @@ export const DocumentsView: React.FC = () => {
 
   const filtered = documents.filter((d) => {
     const matchSearch =
-      d.title.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
-      d.ref.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+      (d.title || d.name || '').toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+      (d.ref || '').toLowerCase().includes(effectiveSearch.toLowerCase()) ||
       (d.propertyName && d.propertyName.toLowerCase().includes(effectiveSearch.toLowerCase())) ||
       (d.ownerName && d.ownerName.toLowerCase().includes(effectiveSearch.toLowerCase()));
 
@@ -137,7 +137,7 @@ export const DocumentsView: React.FC = () => {
 
                   {/* Type */}
                   <td className="py-3 px-4 capitalize text-slate-600">
-                    {doc.type.replace('_', ' ')}
+                    {String(doc.type || doc.category || 'document').replace('_', ' ')}
                   </td>
 
                   {/* Associé à */}

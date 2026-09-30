@@ -37,14 +37,14 @@ export const OwnersView: React.FC<OwnersViewProps> = ({
   const filtered = owners.filter((o) => {
     return (
       o.fullName.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
-      o.ref.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+      (o.ref || '').toLowerCase().includes(effectiveSearch.toLowerCase()) ||
       (o.company && o.company.toLowerCase().includes(effectiveSearch.toLowerCase())) ||
       o.city.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
       o.phone.includes(effectiveSearch)
     );
   });
 
-  const totalPayoutBalance = owners.reduce((acc, o) => acc + o.currentBalanceToPayout, 0);
+  const totalPayoutBalance = owners.reduce((acc, o) => acc + (o.currentBalanceToPayout || 0), 0);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-16">
@@ -114,7 +114,7 @@ export const OwnersView: React.FC<OwnersViewProps> = ({
             <tbody className="divide-y divide-slate-100">
               {filtered.map((owner) => {
                 const ownerProps = properties.filter((p) => p.ownerId === owner.id);
-                const hasBalance = owner.currentBalanceToPayout > 0;
+                const hasBalance = (owner.currentBalanceToPayout || 0) > 0;
 
                 return (
                   <tr key={owner.id} className="hover:bg-slate-50/70 transition-colors">
@@ -146,7 +146,7 @@ export const OwnersView: React.FC<OwnersViewProps> = ({
 
                     {/* Revenus */}
                     <td className="py-3.5 px-4 text-right font-medium text-slate-800 tabular-nums">
-                      {formatPrice(owner.totalRevenueGenerated)}
+                      {formatPrice(owner.totalRevenueGenerated || 0)}
                     </td>
 
                     {/* Solde à reverser */}
@@ -156,7 +156,7 @@ export const OwnersView: React.FC<OwnersViewProps> = ({
                           hasBalance ? 'text-amber-800' : 'text-slate-400'
                         }`}
                       >
-                        {formatPrice(owner.currentBalanceToPayout)}
+                        {formatPrice(owner.currentBalanceToPayout || 0)}
                       </span>
                     </td>
 

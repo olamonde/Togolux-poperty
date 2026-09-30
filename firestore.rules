@@ -1,0 +1,181 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isBootstrappedAdmin() {
+      return isSignedIn() && request.auth.token.email == 'olamonde7@gmail.com';
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasUserDoc() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function getUserRole() {
+      return hasUserDoc() ? getUserData().role : '';
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin() || (hasUserDoc() && getUserRole() == 'admin');
+    }
+
+    function isManager() {
+      return isAdmin() || (hasUserDoc() && getUserRole() == 'manager');
+    }
+
+    function isAccountant() {
+      return isAdmin() || (hasUserDoc() && (getUserRole() == 'manager' || getUserRole() == 'accountant'));
+    }
+
+    function isAgent() {
+      return isAdmin() || (hasUserDoc() && (getUserRole() == 'manager' || getUserRole() == 'agent'));
+    }
+
+    function isStaff() {
+      return isBootstrappedAdmin() || (hasUserDoc() && (
+        getUserRole() == 'admin' ||
+        getUserRole() == 'manager' ||
+        getUserRole() == 'accountant' ||
+        getUserRole() == 'agent'
+      ));
+    }
+
+    function isOwnerOf(ownerId) {
+      return isSignedIn() && (
+        request.auth.uid == ownerId ||
+        (hasUserDoc() && getUserData().get('ownerId', '') == ownerId)
+      );
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isStaff());
+      allow list: if isStaff();
+      allow create: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow update: if isSignedIn() && (
+        isAdmin() || 
+        (request.auth.uid == userId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'status']))
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Owners Collection
+    match /owners/{ownerId} {
+      allow get: if isStaff() || isOwnerOf(ownerId);
+      allow list: if isStaff();
+      allow create, update: if isManager() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Properties Collection
+    match /properties/{propertyId} {
+      allow get: if isStaff() || isOwnerOf(resource.data.ownerId);
+      allow list: if isStaff() || isOwnerOf(resource.data.ownerId);
+      allow create, update: if isStaff();
+      allow delete: if isManager() || isAdmin();
+    }
+
+    // Tenants Collection
+    match /tenants/{tenantId} {
+      allow read: if isStaff();
+      allow create, update: if isStaff();
+      allow delete: if isManager() || isAdmin();
+    }
+
+    // Contracts Collection
+    match /contracts/{contractId} {
+      allow get: if isStaff() || isOwnerOf(resource.data.ownerId);
+      allow list: if isStaff() || isOwnerOf(resource.data.ownerId);
+      allow create, update: if isManager() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Payments Collection
+    match /payments/{paymentId} {
+      allow get: if isStaff() || isOwnerOf(resource.data.ownerId);
+      allow list: if isStaff() || isOwnerOf(resource.data.ownerId);
+      allow create, update: if isAccountant() || isManager() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Expenses Collection
+    match /expenses/{expenseId} {
+      allow get: if isStaff() || isOwnerOf(resource.data.ownerId);
+      allow list: if isStaff() || isOwnerOf(resource.data.ownerId);
+      allow create, update: if isAccountant() || isManager() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Owner Payouts Collection
+    match /ownerPayouts/{payoutId} {
+      allow get: if isStaff() || isOwnerOf(resource.data.ownerId);
+      allow list: if isStaff() || isOwnerOf(resource.data.ownerId);
+      allow create, update: if isAccountant() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Maintenance Requests Collection
+    match /maintenanceRequests/{maintenanceId} {
+      allow get: if isStaff() || isOwnerOf(resource.data.ownerId);
+      allow list: if isStaff() || isOwnerOf(resource.data.ownerId);
+      allow create: if isStaff() || isOwnerOf(request.resource.data.ownerId);
+      allow update: if isStaff() || (
+        isOwnerOf(resource.data.ownerId) && 
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ownerApproved', 'ownerApprovedAt', 'notes'])
+      );
+      allow delete: if isManager() || isAdmin();
+    }
+
+    // Vendors Collection
+    match /vendors/{vendorId} {
+      allow read: if isStaff();
+      allow create, update: if isStaff();
+      allow delete: if isManager() || isAdmin();
+    }
+
+    // Documents Collection
+    match /documents/{documentId} {
+      allow get: if isStaff() || (resource.data.ownerId != null && isOwnerOf(resource.data.ownerId));
+      allow list: if isStaff() || (resource.data.ownerId != null && isOwnerOf(resource.data.ownerId));
+      allow create, update: if isStaff();
+      allow delete: if isManager() || isAdmin();
+    }
+
+    // Reports Collection
+    match /reports/{reportId} {
+      allow get: if isStaff() || (resource.data.ownerId != null && isOwnerOf(resource.data.ownerId));
+      allow list: if isStaff() || (resource.data.ownerId != null && isOwnerOf(resource.data.ownerId));
+      allow create, update: if isStaff();
+      allow delete: if isAdmin();
+    }
+
+    // Notifications Collection
+    match /notifications/{notificationId} {
+      allow get, list: if isSignedIn() && (resource.data.recipientUserId == request.auth.uid || isStaff());
+      allow create: if isStaff();
+      allow update: if isSignedIn() && resource.data.recipientUserId == request.auth.uid && 
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow delete: if isSignedIn() && resource.data.recipientUserId == request.auth.uid;
+    }
+
+    // Audit Logs Collection (strictly immutable)
+    match /auditLogs/{logId} {
+      allow get, list: if isStaff();
+      allow create: if isSignedIn();
+      allow update, delete: if false;
+    }
+  }
+}

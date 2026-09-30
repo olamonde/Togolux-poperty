@@ -15,7 +15,7 @@ export const RentPaymentModal: React.FC<RentPaymentModalProps> = ({
 }) => {
   const { formatPrice, recordRentPayment, agencyConfig } = useApp();
 
-  const [amount, setAmount] = useState<number>(tenant.monthlyRent);
+  const [amount, setAmount] = useState<number>(tenant.monthlyRent || 0);
   const [paymentMethod, setPaymentMethod] = useState('Virement bancaire');
   const [success, setSuccess] = useState(false);
 
@@ -67,7 +67,7 @@ export const RentPaymentModal: React.FC<RentPaymentModalProps> = ({
               <div className="flex items-center justify-between text-slate-600">
                 <span>Loyer contractuel :</span>
                 <span className="font-semibold text-slate-900">
-                  {formatPrice(tenant.monthlyRent)}
+                  {formatPrice(tenant.monthlyRent || 0)}
                 </span>
               </div>
             </div>

@@ -5,12 +5,32 @@ import {
   RotateCcw,
   ShieldCheck,
   CheckCircle2,
+  Database,
+  RefreshCw,
+  Server,
+  KeyRound,
+  FileCheck,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export const SettingsView: React.FC = () => {
-  const { agencyConfig, updateAgencyConfig, resetAgencyConfig, staffUsers, currentUser } =
-    useApp();
+  const {
+    agencyConfig,
+    updateAgencyConfig,
+    resetAgencyConfig,
+    staffUsers,
+    currentUser,
+    isFirestoreConnected,
+    reseedFirestore,
+    properties,
+    owners,
+    tenants,
+    contracts,
+    transactions,
+    maintenanceTickets,
+    documents,
+    reports,
+  } = useApp();
 
   const [companyName, setCompanyName] = useState(agencyConfig.companyName);
   const [legalName, setLegalName] = useState(agencyConfig.legalName);
@@ -30,6 +50,22 @@ export const SettingsView: React.FC = () => {
   );
 
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
+
+  const handleResyncFirestore = async () => {
+    setIsSyncing(true);
+    setSyncFeedback(null);
+    try {
+      const res = await reseedFirestore(true);
+      setSyncFeedback(res.message);
+    } catch (err) {
+      setSyncFeedback(`Erreur: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setIsSyncing(false);
+      setTimeout(() => setSyncFeedback(null), 4000);
+    }
+  };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -278,6 +314,91 @@ export const SettingsView: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* 5. Base de Données & Sécurité Cloud Firestore */}
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <Database className="w-4 h-4 text-slate-700" />
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                  5. Base de Données & Architecture Relationnelle (Cloud Firestore)
+                </h3>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Couche persistante sécurisée ABAC, collections synchronisées et traçabilité d'audit.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Firestore Connecté</span>
+              </span>
+
+              <button
+                type="button"
+                onClick={handleResyncFirestore}
+                disabled={isSyncing}
+                className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                title="Réinitialiser et peupler toutes les collections relationnelles Firestore"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>{isSyncing ? 'Synchronisation...' : 'Synchroniser Firestore'}</span>
+              </button>
+            </div>
+          </div>
+
+          {syncFeedback && (
+            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-xs font-medium flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
+              <span>{syncFeedback}</span>
+            </div>
+          )}
+
+          {/* Counts metrics */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 text-xs">
+            <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+              <span className="text-[10px] text-slate-400 block font-medium">Biens (properties)</span>
+              <span className="text-base font-bold text-slate-900">{properties.length}</span>
+            </div>
+            <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+              <span className="text-[10px] text-slate-400 block font-medium">Bailleurs (owners)</span>
+              <span className="text-base font-bold text-slate-900">{owners.length}</span>
+            </div>
+            <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+              <span className="text-[10px] text-slate-400 block font-medium">Baux (contracts)</span>
+              <span className="text-base font-bold text-slate-900">{contracts.length}</span>
+            </div>
+            <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+              <span className="text-[10px] text-slate-400 block font-medium">Paiements / Reçus</span>
+              <span className="text-base font-bold text-slate-900">{transactions.length}</span>
+            </div>
+          </div>
+
+          {/* Matrice des rôles */}
+          <div className="border-t border-slate-100 pt-3 text-[11px] text-slate-600 space-y-1.5">
+            <div className="font-semibold text-slate-800">Matrice de contrôle d'accès (RBAC / ABAC) :</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+              <div className="p-2 rounded bg-slate-50 border border-slate-100 space-y-0.5">
+                <span className="font-semibold text-slate-900">Admin & Manager :</span>
+                <p className="text-slate-500">Accès total aux biens, bailleurs, baux, locataires, maintenance, documents et finances.</p>
+              </div>
+              <div className="p-2 rounded bg-slate-50 border border-slate-100 space-y-0.5">
+                <span className="font-semibold text-slate-900">Comptable (Accountant) :</span>
+                <p className="text-slate-500">Gestion des encaissements de loyer, dépenses, reversements propriétaires et rapports.</p>
+              </div>
+              <div className="p-2 rounded bg-slate-50 border border-slate-100 space-y-0.5">
+                <span className="font-semibold text-slate-900">Agent Terrain :</span>
+                <p className="text-slate-500">Gestion opérationnelle des biens, locataires, interventions et consultation des tiers.</p>
+              </div>
+              <div className="p-2 rounded bg-slate-50 border border-slate-100 space-y-0.5">
+                <span className="font-semibold text-slate-900">Portail Propriétaire (Owner) :</span>
+                <p className="text-slate-500">Isolation stricte : consultation uniquement de ses propres biens, contrats, paiements et travaux.</p>
+              </div>
+            </div>
           </div>
         </div>
 

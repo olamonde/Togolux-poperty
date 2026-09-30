@@ -24,7 +24,8 @@ export const ReportsView: React.FC = () => {
 
   // Filter transactions for period
   const periodTransactions = transactions.filter((t) => {
-    return t.date.startsWith(`${selectedYear}-${selectedMonth}`);
+    const transactionDate = t.paymentDate || t.date || t.createdAt || '';
+    return transactionDate.startsWith(`${selectedYear}-${selectedMonth}`);
   });
 
   const totalRents = periodTransactions

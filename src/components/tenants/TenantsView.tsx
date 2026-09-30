@@ -35,9 +35,9 @@ export const TenantsView: React.FC<TenantsViewProps> = ({
   const filtered = tenants.filter((t) => {
     const matchSearch =
       t.fullName.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
-      t.propertyName.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+      (t.propertyName || '').toLowerCase().includes(effectiveSearch.toLowerCase()) ||
       t.phone.includes(effectiveSearch) ||
-      t.ref.toLowerCase().includes(effectiveSearch.toLowerCase());
+      (t.ref || '').toLowerCase().includes(effectiveSearch.toLowerCase());
 
     const matchStatus = filterStatus === 'all' || t.paymentStatus === filterStatus;
 
@@ -183,7 +183,7 @@ export const TenantsView: React.FC<TenantsViewProps> = ({
                   </td>
 
                   <td className="py-3.5 px-4 text-right font-semibold text-slate-900 tabular-nums">
-                    {formatPrice(tenant.monthlyRent)}
+                    {formatPrice(tenant.monthlyRent || 0)}
                   </td>
 
                   <td className="py-3.5 px-4 text-slate-500">

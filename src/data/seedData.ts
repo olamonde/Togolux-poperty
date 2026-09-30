@@ -549,6 +549,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
 ];
 
 export const INITIAL_MAINTENANCE_TICKETS: MaintenanceTicket[] = [
+
   {
     id: 'mtn-1',
     ref: 'INT-2026-031',

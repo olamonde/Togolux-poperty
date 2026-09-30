@@ -62,12 +62,12 @@ export const OwnerPayoutModal: React.FC<OwnerPayoutModalProps> = ({ owner, onClo
                   Solde net disponible
                 </span>
                 <span className="text-base font-bold text-slate-900">
-                  {formatPrice(owner.currentBalanceToPayout)}
+                  {formatPrice(owner.currentBalanceToPayout || 0)}
                 </span>
               </div>
               <button
                 type="button"
-                onClick={() => setAmount(owner.currentBalanceToPayout)}
+                onClick={() => setAmount(owner.currentBalanceToPayout || 0)}
                 className="px-2 py-1 rounded bg-white text-slate-700 border border-slate-200 text-[11px] font-medium hover:bg-slate-100"
               >
                 Tout reverser
@@ -104,10 +104,12 @@ export const OwnerPayoutModal: React.FC<OwnerPayoutModalProps> = ({ owner, onClo
               </select>
             </div>
 
-            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-0.5">
-              <div><b>Banque :</b> {owner.bankDetails.bankName}</div>
-              <div><b>RIB :</b> {owner.bankDetails.accountNumber}</div>
-            </div>
+            {owner.bankDetails && (
+              <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-0.5">
+                <div><b>Banque :</b> {owner.bankDetails.bankName}</div>
+                <div><b>RIB :</b> {owner.bankDetails.accountNumber}</div>
+              </div>
+            )}
 
             <div>
               <label className="text-slate-700 font-medium block mb-1">Libellé / Note</label>

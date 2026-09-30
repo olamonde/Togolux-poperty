@@ -1,0 +1,409 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Utilisateurs du système ImmoPilot (employés de TogoLux Properties et comptes propriétaires)",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "firstName": { "type": "string", "description": "Prénom" },
+        "lastName": { "type": "string", "description": "Nom de famille" },
+        "displayName": { "type": "string", "description": "Nom complet affiché" },
+        "email": { "type": "string", "format": "email", "description": "Adresse email professionnelle ou propriétaire" },
+        "phone": { "type": "string", "description": "Numéro de téléphone" },
+        "photoURL": { "type": "string", "description": "URL de la photo de profil" },
+        "role": { "type": "string", "enum": ["admin", "manager", "accountant", "agent", "owner"], "description": "Rôle et niveau d'accès dans l'application" },
+        "status": { "type": "string", "enum": ["active", "inactive", "suspended"], "description": "Statut du compte" },
+        "createdAt": { "type": "string", "description": "Timestamp ISO de création" },
+        "updatedAt": { "type": "string", "description": "Timestamp ISO de mise à jour" },
+        "lastLoginAt": { "type": "string", "description": "Timestamp ISO de dernière connexion" }
+      },
+      "required": ["uid", "email", "role", "status"]
+    },
+    "Owner": {
+      "title": "Owner",
+      "description": "Fiche d'un propriétaire bailleur géré par l'agence TogoLux Properties",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant unique" },
+        "firstName": { "type": "string", "description": "Prénom du propriétaire" },
+        "lastName": { "type": "string", "description": "Nom de famille" },
+        "fullName": { "type": "string", "description": "Nom complet" },
+        "email": { "type": "string", "format": "email", "description": "Email" },
+        "phone": { "type": "string", "description": "Téléphone principal" },
+        "secondaryPhone": { "type": "string", "description": "Téléphone secondaire ou WhatsApp" },
+        "country": { "type": "string", "description": "Pays de résidence" },
+        "city": { "type": "string", "description": "Ville" },
+        "address": { "type": "string", "description": "Adresse physique" },
+        "photoURL": { "type": "string", "description": "Photo de profil ou logo" },
+        "notes": { "type": "string", "description": "Notes internes" },
+        "status": { "type": "string", "enum": ["active", "inactive"], "description": "Statut bailleur" },
+        "userId": { "type": "string", "description": "UID Firebase Auth si un compte portail propriétaire lui est associé" },
+        "createdAt": { "type": "string", "description": "Timestamp de création" },
+        "updatedAt": { "type": "string", "description": "Timestamp de mise à jour" }
+      },
+      "required": ["id", "fullName", "phone", "status"]
+    },
+    "Property": {
+      "title": "Property",
+      "description": "Bien immobilier géré en mandat par l'agence TogoLux Properties",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant unique" },
+        "name": { "type": "string", "description": "Nom désignant le bien" },
+        "reference": { "type": "string", "description": "Référence mandat (ex: TL-VIL-001)" },
+        "type": { "type": "string", "enum": ["apartment", "villa", "house", "office", "commercial", "land", "other"], "description": "Type de bien" },
+        "status": { "type": "string", "enum": ["available", "occupied", "maintenance", "renovation", "sold", "archived"], "description": "Statut d'occupation et disponibilité" },
+        "description": { "type": "string", "description": "Descriptif détaillé" },
+        "address": { "type": "string", "description": "Adresse exacte" },
+        "city": { "type": "string", "description": "Ville (ex: Lomé)" },
+        "neighborhood": { "type": "string", "description": "Quartier (ex: Tokoin, Cité OUA)" },
+        "country": { "type": "string", "description": "Pays (ex: Togo)" },
+        "latitude": { "type": "number", "description": "Coordonnée latitude" },
+        "longitude": { "type": "number", "description": "Coordonnée longitude" },
+        "surface": { "type": "number", "description": "Superficie en m²" },
+        "bedrooms": { "type": "number", "description": "Nombre de chambres" },
+        "bathrooms": { "type": "number", "description": "Nombre de salles de bain" },
+        "parkingSpaces": { "type": "number", "description": "Nombre de places de stationnement" },
+        "amenities": { "type": "array", "description": "Équipements et prestations" },
+        "photos": { "type": "array", "description": "Photos du bien" },
+        "ownerId": { "type": "string", "description": "ID du propriétaire détenteur du bien" },
+        "currentTenantId": { "type": "string", "description": "ID du locataire en cours si occupé" },
+        "currentContractId": { "type": "string", "description": "ID du contrat de bail actif" },
+        "monthlyRent": { "type": "number", "description": "Loyer mensuel hors charges" },
+        "securityDeposit": { "type": "number", "description": "Montant du dépôt de garantie / caution" },
+        "currency": { "type": "string", "description": "Devise (XOF / FCFA)" },
+        "availableFrom": { "type": "string", "description": "Date de disponibilité" },
+        "createdAt": { "type": "string", "description": "Date de création" },
+        "updatedAt": { "type": "string", "description": "Date de mise à jour" }
+      },
+      "required": ["id", "name", "reference", "type", "status", "ownerId", "monthlyRent", "currency"]
+    },
+    "Tenant": {
+      "title": "Tenant",
+      "description": "Locataire d'un bien géré par l'agence",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant unique" },
+        "firstName": { "type": "string", "description": "Prénom" },
+        "lastName": { "type": "string", "description": "Nom de famille" },
+        "fullName": { "type": "string", "description": "Nom complet" },
+        "email": { "type": "string", "format": "email", "description": "Email de contact" },
+        "phone": { "type": "string", "description": "Téléphone principal" },
+        "secondaryPhone": { "type": "string", "description": "Téléphone d'urgence" },
+        "nationality": { "type": "string", "description": "Nationalité" },
+        "dateOfBirth": { "type": "string", "description": "Date de naissance" },
+        "address": { "type": "string", "description": "Adresse" },
+        "idDocumentType": { "type": "string", "description": "Type de pièce d'identité (CNI, Passeport, Titre de séjour)" },
+        "idDocumentNumber": { "type": "string", "description": "Numéro de la pièce" },
+        "idDocumentFile": { "type": "string", "description": "Chemin ou URL du document d'identité stocké" },
+        "photoURL": { "type": "string", "description": "Photo de profil" },
+        "status": { "type": "string", "enum": ["active", "late", "notice", "former"], "description": "Statut du locataire" },
+        "notes": { "type": "string", "description": "Notes de gestion" },
+        "createdAt": { "type": "string", "description": "Date de création" },
+        "updatedAt": { "type": "string", "description": "Date de mise à jour" }
+      },
+      "required": ["id", "fullName", "phone", "status"]
+    },
+    "Contract": {
+      "title": "Contract",
+      "description": "Contrat de bail locatif reliant un bien, un propriétaire et un locataire",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant unique" },
+        "reference": { "type": "string", "description": "Numéro de contrat (ex: CTR-2026-014)" },
+        "propertyId": { "type": "string", "description": "ID du bien loué" },
+        "ownerId": { "type": "string", "description": "ID du bailleur" },
+        "tenantId": { "type": "string", "description": "ID du locataire preneur" },
+        "type": { "type": "string", "enum": ["residential", "commercial", "professional", "temporary"], "description": "Type de bail" },
+        "startDate": { "type": "string", "description": "Date de début du bail" },
+        "endDate": { "type": "string", "description": "Date de fin du bail" },
+        "monthlyRent": { "type": "number", "description": "Loyer mensuel en FCFA" },
+        "securityDeposit": { "type": "number", "description": "Dépôt de garantie en FCFA" },
+        "paymentFrequency": { "type": "string", "enum": ["monthly", "quarterly", "biannual", "annual"], "description": "Périodicité de paiement" },
+        "currency": { "type": "string", "description": "Devise (XOF)" },
+        "status": { "type": "string", "enum": ["draft", "active", "expired", "terminated", "cancelled"], "description": "Statut de validité" },
+        "signedAt": { "type": "string", "description": "Date de signature effective" },
+        "documentId": { "type": "string", "description": "Référence du document PDF scanné" },
+        "createdAt": { "type": "string", "description": "Date de création" },
+        "updatedAt": { "type": "string", "description": "Date de mise à jour" }
+      },
+      "required": ["id", "reference", "propertyId", "ownerId", "tenantId", "monthlyRent", "status"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Encaissement de loyer, caution ou autre règlement locatif",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant unique" },
+        "reference": { "type": "string", "description": "Numéro de reçu officiel (ex: REC-2026-0042)" },
+        "propertyId": { "type": "string", "description": "ID du bien concerné" },
+        "ownerId": { "type": "string", "description": "ID du propriétaire bénéficiaire" },
+        "tenantId": { "type": "string", "description": "ID du locataire payeur" },
+        "contractId": { "type": "string", "description": "ID du contrat de bail" },
+        "type": { "type": "string", "enum": ["rent", "deposit", "other"], "description": "Type de versement" },
+        "amount": { "type": "number", "description": "Montant perçu en FCFA" },
+        "currency": { "type": "string", "description": "Devise (XOF)" },
+        "paymentDate": { "type": "string", "description": "Date d'encaissement" },
+        "periodStart": { "type": "string", "description": "Début de la période couverte" },
+        "periodEnd": { "type": "string", "description": "Fin de la période couverte" },
+        "paymentMethod": { "type": "string", "enum": ["cash", "bank_transfer", "mobile_money", "card", "other"], "description": "Mode de règlement" },
+        "status": { "type": "string", "enum": ["pending", "paid", "partial", "late", "cancelled"], "description": "État du paiement" },
+        "description": { "type": "string", "description": "Libellé de l'encaissement" },
+        "receiptDocumentId": { "type": "string", "description": "ID de la quittance / reçu" },
+        "createdAt": { "type": "string", "description": "Date de saisie" },
+        "updatedAt": { "type": "string", "description": "Date de mise à jour" },
+        "createdBy": { "type": "string", "description": "UID de l'agent ayant enregistré le paiement" }
+      },
+      "required": ["id", "reference", "propertyId", "ownerId", "tenantId", "amount", "status", "paymentMethod"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Dépense ou charge imputée à un bien immobilier ou à l'agence",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant de la dépense" },
+        "reference": { "type": "string", "description": "Référence de la facture/dépense (ex: DEP-2026-018)" },
+        "propertyId": { "type": "string", "description": "ID du bien supportant la dépense" },
+        "ownerId": { "type": "string", "description": "ID du propriétaire concerné" },
+        "category": { "type": "string", "enum": ["maintenance", "repair", "utilities", "tax", "management_fee", "renovation", "purchase", "other"], "description": "Type de charge" },
+        "description": { "type": "string", "description": "Libellé détaillé des travaux ou frais" },
+        "amount": { "type": "number", "description": "Montant en FCFA" },
+        "currency": { "type": "string", "description": "Devise (XOF)" },
+        "expenseDate": { "type": "string", "description": "Date de la facture / dépense" },
+        "vendorId": { "type": "string", "description": "ID du prestataire ayant effectué la prestation" },
+        "status": { "type": "string", "enum": ["pending", "approved", "paid", "cancelled"], "description": "Statut de paiement" },
+        "invoiceDocumentId": { "type": "string", "description": "ID du document de facture" },
+        "notes": { "type": "string", "description": "Notes justificatives" },
+        "createdAt": { "type": "string", "description": "Date de création" },
+        "updatedAt": { "type": "string", "description": "Date de modification" },
+        "createdBy": { "type": "string", "description": "UID de l'utilisateur ayant saisi la dépense" }
+      },
+      "required": ["id", "propertyId", "ownerId", "category", "amount", "currency", "status"]
+    },
+    "OwnerPayout": {
+      "title": "OwnerPayout",
+      "description": "Reversement net des loyers perçus vers le propriétaire après déduction des frais",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant du reversement" },
+        "reference": { "type": "string", "description": "Référence du virement (ex: REV-2026-009)" },
+        "ownerId": { "type": "string", "description": "ID du propriétaire" },
+        "periodStart": { "type": "string", "description": "Période de gestion début" },
+        "periodEnd": { "type": "string", "description": "Période de gestion fin" },
+        "totalIncome": { "type": "number", "description": "Total des loyers perçus sur la période" },
+        "totalExpenses": { "type": "number", "description": "Total des dépenses et travaux déduits" },
+        "managementFees": { "type": "number", "description": "Commission de gestion TogoLux Properties" },
+        "otherDeductions": { "type": "number", "description": "Autres retenues" },
+        "netAmount": { "type": "number", "description": "Montant net viré au propriétaire en FCFA" },
+        "currency": { "type": "string", "description": "Devise (XOF)" },
+        "status": { "type": "string", "enum": ["pending", "approved", "paid", "cancelled"], "description": "Statut du reversement" },
+        "paymentDate": { "type": "string", "description": "Date effective de versement" },
+        "paymentMethod": { "type": "string", "description": "Mode de versement (Virement bancaire, chèque, etc.)" },
+        "createdAt": { "type": "string", "description": "Date de calcul" },
+        "updatedAt": { "type": "string", "description": "Date de validation" },
+        "createdBy": { "type": "string", "description": "Comptable ayant préparé le reversement" }
+      },
+      "required": ["id", "reference", "ownerId", "netAmount", "status"]
+    },
+    "MaintenanceRequest": {
+      "title": "MaintenanceRequest",
+      "description": "Demande d'intervention technique, réparation ou travaux sur un bien",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant de l'intervention" },
+        "reference": { "type": "string", "description": "Référence ticket (ex: WRK-2026-031)" },
+        "propertyId": { "type": "string", "description": "ID du bien concerné" },
+        "ownerId": { "type": "string", "description": "ID du bailleur propriétaire" },
+        "reportedBy": { "type": "string", "description": "Nom ou ID de la personne ayant signalé le problème" },
+        "assignedTo": { "type": "string", "description": "UID de l'agent TogoLux responsable du suivi" },
+        "title": { "type": "string", "description": "Objet de l'intervention" },
+        "description": { "type": "string", "description": "Description détaillée de l'incident" },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "urgent"], "description": "Niveau d'urgence" },
+        "status": { "type": "string", "enum": ["reported", "review", "awaiting_approval", "scheduled", "in_progress", "completed", "cancelled"], "description": "Statut du workflow d'intervention" },
+        "estimatedCost": { "type": "number", "description": "Devis estimatif en FCFA" },
+        "actualCost": { "type": "number", "description": "Coût réel facturé en FCFA" },
+        "currency": { "type": "string", "description": "Devise (XOF)" },
+        "vendorId": { "type": "string", "description": "ID du prestataire assigné" },
+        "reportedAt": { "type": "string", "description": "Date du signalement" },
+        "scheduledAt": { "type": "string", "description": "Date d'intervention programmée" },
+        "startedAt": { "type": "string", "description": "Date de démarrage effectif" },
+        "completedAt": { "type": "string", "description": "Date de réception des travaux" },
+        "beforePhotos": { "type": "array", "description": "Photos du constat avant travaux" },
+        "afterPhotos": { "type": "array", "description": "Photos du résultat après travaux" },
+        "quoteDocumentId": { "type": "string", "description": "ID du devis scanné" },
+        "invoiceDocumentId": { "type": "string", "description": "ID de la facture d'intervention" },
+        "ownerApprovalRequired": { "type": "boolean", "description": "Nécessite l'approbation préalable du bailleur" },
+        "ownerApproved": { "type": "boolean", "description": "Validation accordée par le propriétaire" },
+        "ownerApprovedAt": { "type": "string", "description": "Date de l'accord propriétaire" },
+        "notes": { "type": "string", "description": "Commentaires internes de suivi" },
+        "createdAt": { "type": "string", "description": "Date de création" },
+        "updatedAt": { "type": "string", "description": "Date de mise à jour" }
+      },
+      "required": ["id", "reference", "propertyId", "ownerId", "title", "priority", "status"]
+    },
+    "Vendor": {
+      "title": "Vendor",
+      "description": "Artisan, technicien ou entreprise prestataire intervenant pour l'agence",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant du prestataire" },
+        "name": { "type": "string", "description": "Nom du contact principal" },
+        "companyName": { "type": "string", "description": "Nom de l'entreprise artisanale" },
+        "phone": { "type": "string", "description": "Téléphone" },
+        "email": { "type": "string", "format": "email", "description": "Email" },
+        "address": { "type": "string", "description": "Adresse à Lomé" },
+        "specialty": { "type": "string", "description": "Corps de métier (Plomberie, Climatisation, Électricité, etc.)" },
+        "notes": { "type": "string", "description": "Notes sur la qualité des prestations et tarifs" },
+        "status": { "type": "string", "enum": ["active", "inactive"], "description": "Disponibilité" },
+        "createdAt": { "type": "string", "description": "Date d'enregistrement" },
+        "updatedAt": { "type": "string", "description": "Date de mise à jour" }
+      },
+      "required": ["id", "name", "phone", "specialty", "status"]
+    },
+    "Document": {
+      "title": "Document",
+      "description": "Fichier numérique GED rattaché à une entité métier (propriété, contrat, bailleur, locataire...)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant du document" },
+        "name": { "type": "string", "description": "Titre du document" },
+        "fileName": { "type": "string", "description": "Nom d'origine du fichier" },
+        "fileType": { "type": "string", "description": "Type MIME (ex: application/pdf)" },
+        "fileSize": { "type": "number", "description": "Taille en octets" },
+        "storagePath": { "type": "string", "description": "Chemin relatif dans Firebase Storage" },
+        "category": { "type": "string", "enum": ["contract", "identity", "property", "invoice", "receipt", "quote", "report", "other"], "description": "Catégorie documentaire" },
+        "propertyId": { "type": "string", "description": "ID du bien lié" },
+        "ownerId": { "type": "string", "description": "ID du propriétaire lié" },
+        "tenantId": { "type": "string", "description": "ID du locataire lié" },
+        "contractId": { "type": "string", "description": "ID du contrat de bail lié" },
+        "paymentId": { "type": "string", "description": "ID du paiement lié" },
+        "expenseId": { "type": "string", "description": "ID de la dépense liée" },
+        "maintenanceRequestId": { "type": "string", "description": "ID de l'intervention liée" },
+        "reportId": { "type": "string", "description": "ID du rapport lié" },
+        "uploadedBy": { "type": "string", "description": "UID de l'utilisateur ayant téléversé le document" },
+        "createdAt": { "type": "string", "description": "Date d'import" },
+        "updatedAt": { "type": "string", "description": "Date de mise à jour" }
+      },
+      "required": ["id", "name", "category", "storagePath"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Rapport périodique d'activité de gestion généré pour un propriétaire ou pour l'agence",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant du rapport" },
+        "reference": { "type": "string", "description": "Référence du rapport (ex: RAP-2026-M09)" },
+        "type": { "type": "string", "enum": ["owner_monthly", "property", "financial", "maintenance", "custom"], "description": "Type de rapport" },
+        "ownerId": { "type": "string", "description": "ID du propriétaire destinataire" },
+        "propertyId": { "type": "string", "description": "ID du bien analysé si spécifique" },
+        "periodStart": { "type": "string", "description": "Début de la période analysée" },
+        "periodEnd": { "type": "string", "description": "Fin de la période analysée" },
+        "title": { "type": "string", "description": "Titre du rapport" },
+        "summary": { "type": "string", "description": "Synthèse exécutive" },
+        "totalIncome": { "type": "number", "description": "Total des revenus générés" },
+        "totalExpenses": { "type": "number", "description": "Total des charges imputées" },
+        "managementFees": { "type": "number", "description": "Commissions prélevées" },
+        "netAmount": { "type": "number", "description": "Solde net propriétaire" },
+        "maintenanceSummary": { "type": "string", "description": "Synthèse des interventions réalisées" },
+        "generatedBy": { "type": "string", "description": "UID de l'agent ayant généré le rapport" },
+        "generatedAt": { "type": "string", "description": "Date et heure de génération" },
+        "status": { "type": "string", "enum": ["draft", "published", "archived"], "description": "Statut de publication" },
+        "documentId": { "type": "string", "description": "ID du PDF archivé" }
+      },
+      "required": ["id", "reference", "type", "title", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Notification d'alerte métier pour un utilisateur",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant de la notification" },
+        "recipientUserId": { "type": "string", "description": "UID du destinataire" },
+        "type": { "type": "string", "enum": ["payment_late", "payment_received", "maintenance", "contract_expiring", "report_available", "document", "system"], "description": "Type d'événement" },
+        "title": { "type": "string", "description": "Titre de l'alerte" },
+        "message": { "type": "string", "description": "Contenu du message" },
+        "relatedEntityType": { "type": "string", "description": "Type d'entité liée (property, payment, maintenance...)" },
+        "relatedEntityId": { "type": "string", "description": "ID de l'entité liée" },
+        "read": { "type": "boolean", "description": "Indicateur de lecture" },
+        "createdAt": { "type": "string", "description": "Timestamp de réception" }
+      },
+      "required": ["id", "recipientUserId", "type", "title", "message", "read"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Journal immuable de traçabilité des actions critiques",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifiant du log" },
+        "userId": { "type": "string", "description": "UID de l'auteur de l'action" },
+        "userName": { "type": "string", "description": "Nom de l'utilisateur" },
+        "action": { "type": "string", "description": "Verbe d'action (create, update, delete, payout, approve...)" },
+        "entityType": { "type": "string", "description": "Type de ressource impactée" },
+        "entityId": { "type": "string", "description": "ID de la ressource" },
+        "description": { "type": "string", "description": "Phrase descriptive en français" },
+        "metadata": { "type": "object", "description": "Détails complémentaires de l'événement" },
+        "createdAt": { "type": "string", "description": "Horodatage précis de l'action" }
+      },
+      "required": ["id", "userId", "action", "entityType", "entityId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Profils des utilisateurs du système avec leur rôle RBAC"
+    },
+    "/owners/{ownerId}": {
+      "schema": { "$ref": "#/entities/Owner" },
+      "description": "Propriétaires bailleurs"
+    },
+    "/properties/{propertyId}": {
+      "schema": { "$ref": "#/entities/Property" },
+      "description": "Biens immobiliers gérés par l'agence"
+    },
+    "/tenants/{tenantId}": {
+      "schema": { "$ref": "#/entities/Tenant" },
+      "description": "Locataires"
+    },
+    "/contracts/{contractId}": {
+      "schema": { "$ref": "#/entities/Contract" },
+      "description": "Baux et contrats locatifs"
+    },
+    "/payments/{paymentId}": {
+      "schema": { "$ref": "#/entities/Payment" },
+      "description": "Paiements et quittances de loyer"
+    },
+    "/expenses/{expenseId}": {
+      "schema": { "$ref": "#/entities/Expense" },
+      "description": "Dépenses d'entretien et charges"
+    },
+    "/ownerPayouts/{payoutId}": {
+      "schema": { "$ref": "#/entities/OwnerPayout" },
+      "description": "Reversements nets aux bailleurs"
+    },
+    "/maintenanceRequests/{maintenanceId}": {
+      "schema": { "$ref": "#/entities/MaintenanceRequest" },
+      "description": "Demandes d'interventions et travaux"
+    },
+    "/vendors/{vendorId}": {
+      "schema": { "$ref": "#/entities/Vendor" },
+      "description": "Prestataires et artisans"
+    },
+    "/documents/{documentId}": {
+      "schema": { "$ref": "#/entities/Document" },
+      "description": "Métadonnées des fichiers stockés"
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/Report" },
+      "description": "Rapports d'activité de gestion"
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "Notifications ciblées par utilisateur"
+    },
+    "/auditLogs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Journal immuable d'audit"
+    }
+  }
+}

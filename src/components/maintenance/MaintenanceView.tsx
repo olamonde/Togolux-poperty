@@ -31,9 +31,9 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
 
   const filteredTickets = maintenanceTickets.filter((t) => {
     const matchSearch =
-      t.problemTitle.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
-      t.propertyName.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
-      t.category.toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+      (t.problemTitle || t.title || '').toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+      (t.propertyName || '').toLowerCase().includes(effectiveSearch.toLowerCase()) ||
+      (t.category || '').toLowerCase().includes(effectiveSearch.toLowerCase()) ||
       (t.contractorName && t.contractorName.toLowerCase().includes(effectiveSearch.toLowerCase()));
 
     const matchStatus = statusFilter === 'all' || t.status === statusFilter;
